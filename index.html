@@ -1,0 +1,200 @@
+IT Verstalshchik, [23.08.2024 14:02]
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра с Ведрами</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #282c34;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            position: relative;
+            top: 50px;
+        }
+
+        .cup {
+            width: 100px;
+            height: 150px;
+            background-color: brown;
+            border-radius: 50px 50px 0 0;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.6s ease;
+            z-index: 1; 
+        }
+
+        .photo-container {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .photo {
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity var(--photo-transition-duration, 0.3s) ease;
+            margin-top: -85px;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            font-size: 24px;
+            color: white;
+            transition: opacity 0.5s;
+        }
+
+        button {
+            margin-top: 40px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 80%;
+            max-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">0</div>
+    <div class="game-container">
+        <div class="cup" id="cup1"></div>
+        <div class="cup" id="cup2"></div>
+        <div class="cup" id="cup3"></div>
+    </div>
+
+    <div class="photo-container">
+        <div class="photo" style="background-image: url('10053602.jpg');"></div>
+        <div class="photo" style="background-image: url('golden-russian-ruble-coins-currency-money-sign-symbol-background-3d-illustration.jpg');"></div>
+        <div class="photo" style="background-image: url('Stack of money and gold coins 3d cartoon style icon.jpg');"></div>
+    </div>
+
+    <button id="start">Поднять ведра</button>
+
+    <script>
+        var cupTransitionDuration = 2;
+        var photoTransitionDuration = 0.3;
+        var cupStayDuration = 2;
+        var shuffleDuration = 1;
+        var shuffleCount = 3;
+
+        document.documentElement.style.setProperty('--cup-transition-duration', cupTransitionDuration + 's');
+        document.documentElement.style.setProperty('--photo-transition-duration', photoTransitionDuration + 's');
+
+        // Счет начинается с нуля
+        var score = 0;
+        document.getElementById('score').textContent = score;
+
+        document.getElementById('start').addEventListener('click', startGame);
+
+        function startGame() {
+            var cups = document.querySelectorAll('.cup');
+            var photos = document.querySelectorAll('.photo');
+
+            cups.forEach(function(cup) {
+                cup.style.transform = 'translateY(-150px)';
+            });
+            photos.forEach(function(photo) {
+                photo.style.opacity = '1';
+            });
+
+            setTimeout(function() {
+                cups.forEach(function(cup) {
+                    cup.style.transform = 'translateY(0)';
+                });
+
+                setTimeout(function() {
+                    photos.forEach(function(photo) {
+                        photo.style.opacity = '0';
+                    });
+
+                    shuffleCups(cups, shuffleCount);
+                }, photoTransitionDuration * 1000);
+            }, cupStayDuration * 1000);
+        }
+
+        function shuffleCups(cups, shuffleCount) {
+            var currentShuffle = 0;
+
+
+function shuffle() {
+                if (currentShuffle < shuffleCount) {
+                    var positions = [0, 1, 2];
+                    var shuffledPositions = positions.sort(function() {
+                        return Math.random() - 0.5;
+                    }).slice(0, 2);
+
+                    var pos1 = shuffledPositions[0];
+                    var pos2 = shuffledPositions[1];
+
+                    var tempTransform = cups[pos1].style.transform;
+                    cups[pos1].style.transform = 'translateX(' + (pos2 - pos1) * 110 + 'px)';
+                    cups[pos2].style.transform = 'translateX(' + (pos1 - pos2) * 110 + 'px)';
+
+                    setTimeout(function() {
+                        cups[pos1].style.transform = tempTransform;
+                        cups[pos2].style.transform = tempTransform;
+                        currentShuffle++;
+                        shuffle();
+                    }, shuffleDuration * 1000);
+                } else {
+                    allowCupSelection(cups);
+                }
+            }
+
+            shuffle();
+        }
+
+        function allowCupSelection(cups) {
+            cups.forEach(function(cup, index) {
+                cup.addEventListener('click', function() {
+                    cup.style.transform = 'translateY(-150px)';
+                    var photo = document.querySelectorAll('.photo')[index];
+                    photo.style.opacity = '1';
+
+                    updateScore(); // Начинаем начисление очков
+
+                    setTimeout(function() {
+                        cup.style.transform = 'translateY(0)';
+                        photo.style.opacity = '0';
+                    }, 2000);
+                });
+            });
+        }
+
+        function updateScore() {
+            var scoreElement = document.getElementById('score');
+            var target = Math.floor(Math.random() * 2000) + 1;
+            var acceleration = 5;
+
+            var interval = setInterval(function() {
+                if (score < target) {
+                    score += acceleration;
+                    if (score > target) score = target;
+                    scoreElement.textContent = score;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 50);
+        }
+    </script>
+</body>
+</html>
